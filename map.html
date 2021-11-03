@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Custom Icons Tutorial - Leaflet</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+
+    <script src="https://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 500px;
+        }
+
+        .leaflet-cluster-anim .leaflet-marker-icon,
+        .leaflet-cluster-anim .leaflet-marker-shadow {
+            -webkit-transition: -webkit-transform 0.3s ease-out, opacity 0.3s ease-in;
+            -moz-transition: -moz-transform 0.3s ease-out, opacity 0.3s ease-in;
+            -o-transition: -o-transform 0.3s ease-out, opacity 0.3s ease-in;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-in;
+        }
+
+        .leaflet-cluster-spider-leg {
+            /* stroke-dashoffset (duration and function) should match with leaflet-marker-icon transform in order to track it exactly */
+            -webkit-transition: -webkit-stroke-dashoffset 0.3s ease-out, -webkit-stroke-opacity 0.3s ease-in;
+            -moz-transition: -moz-stroke-dashoffset 0.3s ease-out, -moz-stroke-opacity 0.3s ease-in;
+            -o-transition: -o-stroke-dashoffset 0.3s ease-out, -o-stroke-opacity 0.3s ease-in;
+            transition: stroke-dashoffset 0.3s ease-out, stroke-opacity 0.3s ease-in;
+        }
+
+        .marker-cluster-small {
+            background-color: rgba(167, 167, 167, 0.6);
+        }
+
+        .marker-cluster-small div {
+            background-color: rgba(90, 90, 90, 0.8);
+        }
+
+        .marker-cluster-medium {
+            background-color: rgba(167, 167, 167, 0.6);
+        }
+
+        .marker-cluster-medium div {
+            background-color: rgba(90, 90, 90, 0.8);
+        }
+
+        .marker-cluster-large {
+            /* background-color: rgba(253, 156, 115, 0.6); */
+            background-color: rgba(167, 167, 167, 0.6);
+        }
+
+        .marker-cluster-large div {
+            /* background-color: rgba(241, 128, 23, 0.6); */
+            background-color: rgba(90, 90, 90, 0.8);
+        }
+
+
+        .marker-cluster {
+            background-clip: padding-box;
+            border-radius: 20px;
+        }
+
+        .marker-cluster div {
+            width: 30px;
+            height: 30px;
+            margin-left: 5px;
+            margin-top: 5px;
+
+            text-align: center;
+            border-radius: 15px;
+            font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+            color: orange;
+            font-weight: bold;
+        }
+
+        .marker-cluster span {
+            line-height: 30px;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+    <div id='map'></div>
+    <script>
+        var map = L.map('map').setView({ lat: 46.255846818480315, lng: -73.15246582031251 }, 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+
+        var markers = L.markerClusterGroup();
+
+        fetch("data.json")
+            .then(i => i.json())
+            .then(json => {
+                console.log('json', json);
+
+                json = [...new Map(json.map(item => [item["id"], item])).values()]
+
+                json
+                    .filter(i => +i.longitude && +i.latitude)
+                    .forEach(data => {
+                        const { latitude: lat, longitude: lng, name, descr } = { ...data }
+
+                        var marker = L.marker([+lat, +lng])
+                            .bindPopup(`
+                                <h1>${name}</h1>
+                                ${descr}
+                                `)
+                        markers.addLayer(marker);
+                    });
+
+                map.addLayer(markers);
+            })
+
+
+
+        // var LeafIcon = L.Icon.extend({
+        //     options: {
+        //         shadowUrl: 'leaf-shadow.png',
+        //         iconSize: [38, 95],
+        //         shadowSize: [50, 64],
+        //         iconAnchor: [22, 94],
+        //         shadowAnchor: [4, 62],
+        //         popupAnchor: [-3, -76]
+        //     }
+        // });
+
+        // var greenIcon = new LeafIcon({ iconUrl: 'leaf-green.png' }),
+        //     redIcon = new LeafIcon({ iconUrl: 'leaf-red.png' }),
+        //     orangeIcon = new LeafIcon({ iconUrl: 'leaf-orange.png' });
+
+        // L.marker([51.5, -0.09], { icon: greenIcon }).bindPopup("I am a green leaf.").addTo(map);
+        // L.marker([51.495, -0.083], { icon: redIcon }).bindPopup("I am a red leaf.").addTo(map);
+        // L.marker([51.49, -0.1], { icon: orangeIcon }).bindPopup("I am an orange leaf.").addTo(map);
+
+    </script>
+
+
+
+</body>
+
+</html>
